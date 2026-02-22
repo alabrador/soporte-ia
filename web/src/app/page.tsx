@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type SupportResponse = {
   interpreted_intent: string;
@@ -28,6 +28,7 @@ export default function Home() {
   const audioContextRef = useRef<AudioContext | null>(null);
   const silenceMonitorRef = useRef<number | null>(null);
   const continuousModeRef = useRef(false);
+  const autoStartRef = useRef(false);
 
   const backendUrl = useMemo(
     () => process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000",
@@ -208,6 +209,12 @@ export default function Home() {
     setContinuousMode(true);
     await startRecording();
   };
+
+  useEffect(() => {
+    if (autoStartRef.current) return;
+    autoStartRef.current = true;
+    void startContinuousConversation();
+  }, []);
 
   const submitSupportRequest = async (requestMessage: string) => {
     setLoading(true);
